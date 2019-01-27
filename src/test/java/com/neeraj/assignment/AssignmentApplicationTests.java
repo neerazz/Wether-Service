@@ -25,7 +25,6 @@ import com.neeraj.assignment.model.WeatherEntry;
 @SpringBootTest
 public class AssignmentApplicationTests {
 
-	public static final String URL = "https://api.weatherbit.io/v2.0/forecast/hourly?postal_code={zipCode}&country=US&key={apiKey}&hours=48";
 	private MockMvc mockMVC;
 
 	@Autowired

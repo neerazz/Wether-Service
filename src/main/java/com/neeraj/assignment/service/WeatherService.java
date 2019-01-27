@@ -95,7 +95,8 @@ public class WeatherService {
 	public WeatherEntry getLowestWeather(Integer zipCode, Integer days) {
 
 		logger.trace("getWeather method with Zip Code:{} & days: {}.", zipCode, days);
-
+		validateDays(days);
+		validateZip(zipCode);
 		return filterHourlyWeather(getLast48Hours(zipCode),
 				hW -> hW.getLocalTime().toLocalDate().equals(LocalDate.now().plusDays(days)),
 				(hW1, hw2) -> hw2.getTemperature().compareTo(hW1.getTemperature()));
