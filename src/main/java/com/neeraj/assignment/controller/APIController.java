@@ -12,15 +12,15 @@ import com.neeraj.assignment.model.WeatherEntry;
 import com.neeraj.assignment.service.WeatherService;
 
 @RestController
-@RequestMapping("/api/weather")
-public class WeatherController {
+@RequestMapping("/api")
+public class APIController {
 
 	@Autowired
 	private WeatherService weatherService;
 
-	private static final Logger logger = LoggerFactory.getLogger(WeatherController.class);
+	private static final Logger logger = LoggerFactory.getLogger(APIController.class);
 
-	@GetMapping("/{days}/hourly/{zipCode}")
+	@GetMapping("/{days}/{zipCode}")
 	public WeatherEntry getWeather(@PathVariable(value = "days") Integer days,
 			@PathVariable(value = "zipCode") Integer zipCode) {
 
@@ -28,7 +28,7 @@ public class WeatherController {
 		return weatherService.getWeather(zipCode, days);
 	}
 
-	@GetMapping("/{days}/lowest/{zipCode}")
+	@GetMapping("/{days}/{zipCode}/lowest")
 	public WeatherEntry getLowestWeather(@PathVariable(value = "days") Integer days,
 			@PathVariable(value = "zipCode") Integer zipCode) {
 
