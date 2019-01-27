@@ -9,7 +9,6 @@
 
 <body>
 
-
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <h1>Weather</h1>
 </nav>
@@ -44,35 +43,38 @@
     <p class="font-weight-bolder font-italic">
     <div id="wetherdataheadder" style="margin-bottom: 15px"></div>
 
-
     <div class="row">
         <div class="col col-6">
             <div id="wetherdata"></div>
         </div>
+        
         <div class="col col-6">
+            
             <div class="card">
+            
                 <div class="card-body">
+                
                     <div class="row">
                         <div class="col-4">
                             <h5>API Request URL:</h5>
                         </div>
                         <div class="col-8" id="requestURL"></div>
                     </div>
+                    
                     <div class="row">
                         <div class="col">
                             <h5>JSON Response:</h5>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <pre id="responseURL"></pre>
                     </div>
+                    
                 </div>
             </div>
-
         </div>
     </div>
-
-
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -119,7 +121,6 @@
             .fail(function (data) {
                 $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
             });
-
     }
 
     function loadHourlyURL() {

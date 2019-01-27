@@ -48,11 +48,12 @@ public class WeatherService {
 		logger.trace("getLast48Hours method for ZipCode: {}.", zipCode);
 
 		URI url = new UriTemplate(WETHER_URL).expand(zipCode, this.weatherApiKey);
+		ResponseEntity<WeatherEntry> urlRequest = invoke(url, WeatherEntry.class);
 
-		if (!invoke(url, WeatherEntry.class).getStatusCode().equals(HttpStatus.OK)) {
+		if (!urlRequest.getStatusCode().equals(HttpStatus.OK)) {
 			throw new InvalidZipCode("The entered Zip Code " + zipCode + " is invalid. Enter a valid US Zip Code.");
 		}
-		return invoke(url, WeatherEntry.class).getBody();
+		return urlRequest.getBody();
 	}
 
 	/*
