@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Home Page</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -36,7 +34,7 @@
             <label class="form-check-label">Today</label>
         </div>
         <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="tomorrowRadioButton" value="1"
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="tommarowRadioButton" value="1"
                    checked>
             <label class="form-check-label">Tomorrow</label>
         </div>
@@ -46,26 +44,34 @@
     <p class="font-weight-bolder font-italic">
     <div id="wetherdataheadder" style="margin-bottom: 15px"></div>
 
-    <div id="wetherdata"></div>
 
-    <table class="table">
-        <thead class="thead-light">
-        <tr>
-            <th scope="col">API Request URL:</th>
-            <th scope="col">
-                <div id="requestURL"></div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row">Response:</th>
-            <td>
-                <div id="responseURL"></div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col col-6">
+            <div id="wetherdata"></div>
+        </div>
+        <div class="col col-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-4">
+                            <h5>API Request URL:</h5>
+                        </div>
+                        <div class="col-8" id="requestURL"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h5>JSON Response:</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <pre id="responseURL"></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 
 </div>
 
@@ -99,34 +105,55 @@
     });
 
     function loadLowestURL() {
+
+        initilize();
         lowest = true;
         var finalURL = apiURL + radioBokChanged() + "/lowest";
         $("#requestURL").text(finalURL);
 
         $.getJSON(finalURL, function (data) {
             buildPage(data);
-            $("#responseURL").text(JSON.stringify(data));
-        });
+            $("#responseURL").text(JSON.stringify(data, null, 2));
+        })
+
+            .fail(function (data) {
+                $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
+            });
 
     }
 
     function loadHourlyURL() {
+
+        initilize();
         lowest = false;
         var finalURL = apiURL + radioBokChanged();
         $("#requestURL").text(finalURL);
 
         $.getJSON(finalURL, function (data) {
             buildPage(data);
-            $("#responseURL").text(JSON.stringify(data));
-        });
+            $("#responseURL").text(JSON.stringify(data, null, 2));
+        })
+            .fail(function (data) {
+                $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
+            });
+    }
 
+    function initilize() {
+        $("#responseURL").text(" ");
+        $("#requestURL").text(" ");
+        document.getElementById('wetherdata').innerHTML = ' ';
+        $("#wetherdataheadder").text(" ");
     }
 
     function buildPage(dump) {
 
-        var weatherTag = '<div class="d-flex align-content-stretch flex-wrap" style="display: block!important;">';
+        var weatherTag = '<div> <div class="row border justify-content-center bg-success text-white"> ' +
+            '<h4 class="col" style="text-align: center">Time</h4>' +
+            '<h4 class="col" style="text-align: center">Temp</h4>' +
+            '<h4 class="col" style="text-align: center">Description</h4>' +
+            '</div>';
         dump.hourlydate.forEach(function (e) {
-            weatherTag += buildCard(e);
+            weatherTag += buildCard(e, dump.city_name);
         });
 
         document.getElementById('wetherdata').innerHTML = weatherTag + '</div>';
@@ -140,22 +167,22 @@
         return requestURLString + "/" + $('#zipcode').val();
     }
 
-    function buildCard(input) {
+    function buildCard(input, city) {
 
         var datefeild = new Date(input.timestamp_local[0], input.timestamp_local[1], input.timestamp_local[2]);
         datefeild = datefeild.toString().slice(0, datefeild.toString().indexOf("00:00"));
 
         if (lowest === true) {
-            $("#wetherdataheadder").text("Lowest Temperature at " + $('#zipcode').val() + " : " + datefeild);
+            $("#wetherdataheadder").text("Lowest Temperature in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
         } else {
-            $("#wetherdataheadder").text("Weather at " + $('#zipcode').val() + " on " + datefeild + ":");
+            $("#wetherdataheadder").text("Hourly weather in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
         }
 
-        var output = '<div class="card">';
-        output += '<div class="card-body">';
-        output += '<h5 class="card-text" style="display: inline; margin-right: 30px">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';
-        output += '<h5 class="card-text" style="display:inline; margin-right: 20px">' + input.temp + " C" + '</h5>';
-        output += '<h6 class="card-text" style="display: inline; margin-right: 20px">' + input.wetherdescription + '</h6>';
+
+        var output = '<div class="row border justify-content-center">';
+        output += '<h5 class="col" style="text-align: center">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';
+        output += '<h5 class="col" style="text-align:center">' + input.temp + " &deg;C" + '</h5>';
+        output += '<h6 class="col" style="text-align: center">' + input.wetherdescription + '</h6>';
         output += '</div></div>';
         return output
     }
