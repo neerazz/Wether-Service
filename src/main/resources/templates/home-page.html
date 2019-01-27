@@ -39,7 +39,9 @@
 
     </div>
 
-    <p class="font-weight-bolder font-italic">Weather data:</p>
+    <p class="font-weight-bolder font-italic">
+    	<div id="wetherdataheadder"></div>
+    </p>
     <div id="wetherdata"></div>
 
     <table class="table">
@@ -54,7 +56,9 @@
         <tbody>
         <tr>
             <th scope="row">Response:</th>
-            <td>Mark</td>
+            <td>
+            	<div id="responseURL"></div>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -68,6 +72,7 @@
 <script>
 
     var apiURL = "/api/";
+    var lowest = false;
 
     $(document).ready(function () {
 
@@ -90,31 +95,33 @@
     });
 
     function loadLowestURL() {
+    	lowest = true;
         var finalURL = apiURL + radioBokChanged() + "/lowest";
         $("#requestURL").text(finalURL);
 
         $.getJSON(finalURL, function (data) {
             buildPage(data);
-            $("#responseURL").text(finalURL);
+            $("#responseURL").text(JSON.stringify(data));
         });
 
     }
 
     function loadHourlyURL() {
+    	lowest = false;
         var finalURL = apiURL + radioBokChanged();
         $("#requestURL").text(finalURL);
 
         $.getJSON(finalURL, function (data) {
             buildPage(data);
-            $("#responseURL").text(finalURL);
+            $("#responseURL").text(JSON.stringify(data));
         });
 
     }
 
     function buildPage(dump) {
 
-        var weatherTag = '<div class="card-group">';
-        dump[0].hourlydate.forEach(function (e) {
+        var weatherTag = '<div class="d-flex align-content-stretch flex-wrap">';
+        dump.hourlydate.forEach(function (e) {
             weatherTag += buildCard(e);
         })
 
@@ -126,15 +133,25 @@
     }
 
     function zipCodeChanged(requestURLString) {
-        return requestURLString + "/" + $('#zipcode').val();;
+        return requestURLString + "/" + $('#zipcode').val();
     }
 
     function buildCard(input) {
-        var date = new Date(input.timestamp_local);
+    	
+    	var datefeild = new Date(input.timestamp_local[0]  , input.timestamp_local[1] ,input.timestamp_local[2] );
+    	datefeild = datefeild.toString().slice(0,datefeild.toString().indexOf("00:00"));
+    	
+    	if(lowest == true) {
+    		$("#wetherdataheadder").text("Lowest Temperature at "+ $('#zipcode').val() + " : " + datefeild );
+    	}else{
+    		$("#wetherdataheadder").text("Weather at "+ $('#zipcode').val() + " on " + datefeild  + ":");
+    	}
+    	
+    	
         var output = '<div class="card border-dark mb-3" style="max-width: 10 rem;">';
         output += '<div class="card-body">';
         output += '<h5 class="card-title">' + input.temp + " C" + '</h5>';
-        output += '<h5 class="card-text">' + date.getHours() + ":00 hrs" + '</h5>';
+        output += '<h5 class="card-text">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';
         output += '<h6 class="card-subtitle mb-2 text-muted">' + input.wetherdescription + '</h6>';
         output += '</div></div>';
         return output

@@ -25,7 +25,7 @@ import com.neeraj.assignment.model.WeatherEntry;
 @SpringBootTest
 public class AssignmentApplicationTests {
 
-	@Autowired
+	public static final String URL = "https://api.weatherbit.io/v2.0/forecast/hourly?postal_code={zipCode}&country=US&key={apiKey}&hours=48";
 	private MockMvc mockMVC;
 
 	@Autowired
@@ -48,8 +48,8 @@ public class AssignmentApplicationTests {
 		weatherEntry.setState("AZ");
 		when(weatherController.getWeather(0, 85027)).thenReturn(weatherEntry);
 
-		mockMVC.perform(get("/api/weather/0/hourly/85027").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+		mockMVC.perform(get("/api/0/85027").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(jsonPath("$.city_name").value("Maricopa"))
 				.andExpect(jsonPath("$.timezone").value("America/Phoenix"))
 				.andExpect(jsonPath("$.state_code").value("AZ"));
@@ -65,8 +65,8 @@ public class AssignmentApplicationTests {
 		weatherEntry.setState("AZ");
 		when(weatherController.getLowestWeather(0, 85027)).thenReturn(weatherEntry);
 
-		mockMVC.perform(get("/api/weather/0/lowest/85027").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+		mockMVC.perform(get("/api/0/85027/lowest").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(jsonPath("$.city_name").value("Maricopa"))
 				.andExpect(jsonPath("$.timezone").value("America/Phoenix"))
 				.andExpect(jsonPath("$.state_code").value("AZ"));
