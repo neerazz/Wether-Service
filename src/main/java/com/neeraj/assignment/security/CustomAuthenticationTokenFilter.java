@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
+import com.neeraj.assignment.exception.InvalidTokenException;
+
 public class CustomAuthenticationTokenFilter extends AbstractAuthenticationProcessingFilter {
 
 	@Autowired
@@ -34,7 +36,7 @@ public class CustomAuthenticationTokenFilter extends AbstractAuthenticationProce
 		String header = httpServletRequest.getHeader("Authorisation");
 
 		if (header == null || !header.startsWith("Token ")) {
-			throw new RuntimeException("Kindly provide a token. The token feild is empty.");
+			throw new InvalidTokenException("Kindly provide a token. The token feild is empty.");
 		}
 
 		String authenticationToken = header.substring(6);

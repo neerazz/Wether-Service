@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplate;
 
-import com.neeraj.assignment.exception.InvalidDateInRequest;
-import com.neeraj.assignment.exception.InvalidZipCode;
+import com.neeraj.assignment.exception.InvalidDateInRequestException;
+import com.neeraj.assignment.exception.InvalidZipCodeException;
 import com.neeraj.assignment.model.HourlyWeather;
 import com.neeraj.assignment.model.WeatherEntry;
 
@@ -51,7 +51,7 @@ public class WeatherService {
 		ResponseEntity<WeatherEntry> urlRequest = invoke(url, WeatherEntry.class);
 
 		if (!urlRequest.getStatusCode().equals(HttpStatus.OK)) {
-			throw new InvalidZipCode("The entered Zip Code " + zipCode + " is invalid. Enter a valid US Zip Code.");
+			throw new InvalidZipCodeException("The entered Zip Code " + zipCode + " is invalid. Enter a valid US Zip Code.");
 		}
 		return urlRequest.getBody();
 	}
@@ -75,7 +75,7 @@ public class WeatherService {
 	 */
 	private void validateDays(Integer days) {
 		if (days < 0 || days > 1) {
-			throw new InvalidDateInRequest(
+			throw new InvalidDateInRequestException(
 					"The entered days " + days + " is invalid. Number of days must be between 0 & 1.");
 		}
 	}
@@ -85,7 +85,7 @@ public class WeatherService {
 	 */
 	private void validateZip(Integer zipCode) {
 		if (zipCode < 0 || zipCode > 99999 || String.valueOf(zipCode).trim().length() != 5) {
-			throw new InvalidZipCode(
+			throw new InvalidZipCodeException(
 					"The entered Zip Code " + zipCode + " is invalid. Zip Code must be a positive 5 digit number.");
 		}
 	}

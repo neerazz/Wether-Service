@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.neeraj.assignment.exception.InvalidTokenException;
 import com.neeraj.assignment.model.CustomUserDetails;
 import com.neeraj.assignment.model.TokenUserDetails;
 
@@ -45,7 +46,7 @@ public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticat
 		TokenUserDetails jwtUser = validator.validate(token);
 
 		if (jwtUser == null) {
-			throw new RuntimeException("Invalid Token entered. Enter a valid token.");
+			throw new InvalidTokenException("Invalid Token entered. Enter a valid token.");
 		}
 
 		List<GrantedAuthority> grantedAuthorities = AuthorityUtils

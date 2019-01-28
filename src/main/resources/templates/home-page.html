@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="EN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,21 +10,30 @@
 
 <body>
 
-<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <h1>Weather</h1>
-</nav>
-
-<div class="container-fluid">
+    <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+        <h1>Weather</h1>
+    </nav>
 
     <div class="container p-2">
+
+        <form>
+            <div class="form-group row mt-3 mb-3">
+                <label class="col-sm-2 col-form-label">Enter Web Token:</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="jwtToken" placeholder="Example: HEADER.PAYLOAD.SIGNATURE">
+                </div>
+                <button type="button" id="hourlyButton" class="btn btn-outline-warning">Generate Token</button>
+            </div>
+        </form>
 
         <form class="form-inline">
             <div class="form-group">
                 <label>Enter Zip Code:</label>
-                <input type="text" id="zipcode" class="form-control mx-sm-3">
+                <input type="text" id="zipcode" class="form-control mx-sm-3" placeholder="Example: 85027">
                 <button type="button" id="hourlyButton" class="btn btn-outline-primary p-2 m-2">Get Hourly Weather
                 </button>
-                <button type="button" id="lowestButton" class="btn btn-outline-secondary p-2 m-2">Get Lowest Weather
+                <button type="button" id="lowestButton" class="btn btn-outline-secondary p-2 m-2">Get Lowest
+                    Weather
                 </button>
             </div>
         </form>
@@ -34,161 +44,173 @@
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="inlineRadioOptions" id="tommarowRadioButton" value="1"
-                   checked>
+                checked>
             <label class="form-check-label">Tomorrow</label>
         </div>
 
     </div>
 
     <p class="font-weight-bolder font-italic">
-    <div id="wetherdataheadder" style="margin-bottom: 15px"></div>
+        <div id="wetherdataheadder" style="margin-bottom: 15px"></div>
 
-    <div class="row">
-        <div class="col col-6">
-            <div id="wetherdata"></div>
-        </div>
-        
-        <div class="col col-6">
-            
-            <div class="card">
-            
-                <div class="card-body">
-                
-                    <div class="row">
-                        <div class="col-4">
-                            <h5>API Request URL:</h5>
+        <div class="row">
+            <div class="col col-6">
+                <div id="wetherdata"></div>
+            </div>
+
+            <div class="col col-6">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-4">
+                                <h5>API Request URL:</h5>
+                            </div>
+                            <div class="col-8" id="requestURL"></div>
                         </div>
-                        <div class="col-8" id="requestURL"></div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col">
-                            <h5>JSON Response:</h5>
+
+                        <div class="row">
+                            <div class="col">
+                                <h5>JSON Response:</h5>
+                            </div>
                         </div>
+
+                        <div class="row">
+                            <pre id="responseURL"></pre>
+                        </div>
+
                     </div>
-                    
-                    <div class="row">
-                        <pre id="responseURL"></pre>
-                    </div>
-                    
                 </div>
             </div>
         </div>
-    </div>
-</div>
+        </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
 
-<script>
+        <script>
 
-    var apiURL = "/api/";
-    var lowest = false;
+            var apiURL = "/api/";
+            var lowest = false;
 
-    $(document).ready(function () {
+            $(document).ready(function () {
 
-        $('#zipcode').keyup(function () {
-            zipCodeChanged();
-        });
+                $('#zipcode').keyup(function () {
+                    zipCodeChanged();
+                });
 
-        $("input[type='radio']").change(function () {
-            radioBokChanged();
-        });
+                $("input[type='radio']").change(function () {
+                    radioBokChanged();
+                });
 
-        $("#hourlyButton").click(function () {
-            loadHourlyURL();
-        });
+                $("#hourlyButton").click(function () {
+                    loadHourlyURL();
+                });
 
-        $("#lowestButton").click(function () {
-            loadLowestURL();
-        });
+                $("#lowestButton").click(function () {
+                    loadLowestURL();
+                });
 
-    });
-
-    function loadLowestURL() {
-
-        initilize();
-        lowest = true;
-        var finalURL = apiURL + radioBokChanged() + "/lowest";
-        $("#requestURL").text(finalURL);
-
-        $.getJSON(finalURL, function (data) {
-            buildPage(data);
-            $("#responseURL").text(JSON.stringify(data, null, 2));
-        })
-
-            .fail(function (data) {
-                $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
             });
-    }
 
-    function loadHourlyURL() {
+            function loadLowestURL() {
 
-        initilize();
-        lowest = false;
-        var finalURL = apiURL + radioBokChanged();
-        $("#requestURL").text(finalURL);
+                initilize();
+                lowest = true;
+                var finalURL = apiURL + radioBokChanged() + "/lowest";
+                $("#requestURL").text(finalURL);
+                submitTheGetURL(finalURL);
+            }
 
-        $.getJSON(finalURL, function (data) {
-            buildPage(data);
-            $("#responseURL").text(JSON.stringify(data, null, 2));
-        })
-            .fail(function (data) {
-                $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
-            });
-    }
+            function loadHourlyURL() {
 
-    function initilize() {
-        $("#responseURL").text(" ");
-        $("#requestURL").text(" ");
-        document.getElementById('wetherdata').innerHTML = ' ';
-        $("#wetherdataheadder").text(" ");
-    }
+                initilize();
+                lowest = false;
+                var finalURL = apiURL + radioBokChanged();
+                $("#requestURL").text(finalURL);
+                submitTheGetURL(finalURL);
+            }
 
-    function buildPage(dump) {
+            function submitTheGetURL(finalURL) {
 
-        var weatherTag = '<div> <div class="row border justify-content-center bg-success text-white"> ' +
-            '<h4 class="col" style="text-align: center">Time</h4>' +
-            '<h4 class="col" style="text-align: center">Temp</h4>' +
-            '<h4 class="col" style="text-align: center">Description</h4>' +
-            '</div>';
-        dump.hourlydate.forEach(function (e) {
-            weatherTag += buildCard(e, dump.city_name);
-        });
+                var jsonToken = $('#jwtToken').val();
+                var token = "Token " + jsonToken;
+                // console.log(token);
 
-        document.getElementById('wetherdata').innerHTML = weatherTag + '</div>';
-    }
+                // Call the REST API.
+                $.ajax({
+                    type: 'GET',
+                    contentType: 'application/json',
+                    url: finalURL,
+                    headers: {
+                        'Authorisation': token
+                    },
+                    success: function (data) {
+                        buildPage(data);
+                        $("#responseURL").text(JSON.stringify(data, null, 2));
+                    },
+                    error: function (data) {
+                        $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
+                    }
+                });
+            }
 
-    function radioBokChanged() {
-        return zipCodeChanged($("input[name='inlineRadioOptions']:checked").val());
-    }
+            function initilize() {
+                $("#responseURL").text(" ");
+                $("#requestURL").text(" ");
+                document.getElementById('wetherdata').innerHTML = ' ';
+                $("#wetherdataheadder").text(" ");
+            }
 
-    function zipCodeChanged(requestURLString) {
-        return requestURLString + "/" + $('#zipcode').val();
-    }
+            function buildPage(dump) {
+                
+                // console.log(dump);
 
-    function buildCard(input, city) {
+                var weatherTag = '<div> <div class="row border justify-content-center bg-success text-white"> ' +
+                    '<h4 class="col" style="text-align: center">Time</h4>' +
+                    '<h4 class="col" style="text-align: center">Temp</h4>' +
+                    '<h4 class="col" style="text-align: center">Description</h4>' +
+                    '</div>';
+                dump.hourlydate.forEach(function (e) {
+                    weatherTag += buildCard(e, dump.city_name);
+                });
 
-        var datefeild = new Date(input.timestamp_local[0], input.timestamp_local[1], input.timestamp_local[2]);
-        datefeild = datefeild.toString().slice(0, datefeild.toString().indexOf("00:00"));
+                document.getElementById('wetherdata').innerHTML = weatherTag + '</div>';
+            }
 
-        if (lowest === true) {
-            $("#wetherdataheadder").text("Lowest Temperature in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
-        } else {
-            $("#wetherdataheadder").text("Hourly weather in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
-        }
+            function radioBokChanged() {
+                return zipCodeChanged($("input[name='inlineRadioOptions']:checked").val());
+            }
+
+            function zipCodeChanged(requestURLString) {
+                return requestURLString + "/" + $('#zipcode').val();
+            }
+
+            function buildCard(input, city) {
+
+                var datefeild = new Date(input.timestamp_local[0], input.timestamp_local[1], input.timestamp_local[2]);
+                datefeild = datefeild.toString().slice(0, datefeild.toString().indexOf("00:00"));
+
+                if (lowest === true) {
+                    $("#wetherdataheadder").text("Lowest Temperature in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
+                } else {
+                    $("#wetherdataheadder").text("Hourly weather in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
+                }
 
 
-        var output = '<div class="row border justify-content-center">';
-        output += '<h5 class="col" style="text-align: center">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';
-        output += '<h5 class="col" style="text-align:center">' + input.temp + " &deg;C" + '</h5>';
-        output += '<h6 class="col" style="text-align: center">' + input.wetherdescription + '</h6>';
-        output += '</div></div>';
-        return output
-    }
+                var output = '<div class="row border justify-content-center">';
+                output += '<h5 class="col" style="text-align: center">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';
+                output += '<h5 class="col" style="text-align:center">' + input.temp + " &deg;C" + '</h5>';
+                output += '<h6 class="col" style="text-align: center">' + input.wetherdescription + '</h6>';
+                output += '</div></div>';
+                return output
+            }
 
-</script>
+        </script>
 
 </body>
+
 </html>

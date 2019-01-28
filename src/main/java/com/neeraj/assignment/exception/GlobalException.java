@@ -7,35 +7,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.neeraj.assignment.model.ErrorResponse;
 
-@ControllerAdvice
+@ControllerAdvice("com.neeraj.assignment")
 public class GlobalException {
 
-	@ExceptionHandler(InvalidDateInRequest.class)
-	public ResponseEntity<ErrorResponse> handleException(InvalidDateInRequest exc) {
+	@ExceptionHandler(InvalidDateInRequestException.class)
+	public ResponseEntity<ErrorResponse> handleException(InvalidDateInRequestException exc) {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exc.getMessage());
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(InvalidZipCode.class)
-	public ResponseEntity<ErrorResponse> handleException(InvalidZipCode exc) {
+	@ExceptionHandler(InvalidZipCodeException.class)
+	public ResponseEntity<ErrorResponse> handleException(InvalidZipCodeException exc) {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exc.getMessage());
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<ErrorResponse> handleException(RuntimeException exc) {
-		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exc.getMessage());
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(InvalidTokenException exc) {
+		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), exc.getMessage());
+		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(TypeMismatchException.class)
-	@ResponseBody
 	public ResponseEntity<ErrorResponse> handleTypeMismatchException(HttpServletRequest req, TypeMismatchException ex) {
 		String errorMessage = "URL:" + req.getRequestURL().toString()
 				+ " is invalid. Kindly check and provide correct Zip Code and days in URL.";
@@ -43,7 +40,6 @@ public class GlobalException {
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
 	}
 
-	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(HttpServletRequest req,
 			NoHandlerFoundException ex) {
@@ -52,4 +48,5 @@ public class GlobalException {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), errorMessage);
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
 	}
+
 }

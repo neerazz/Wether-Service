@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
+import com.neeraj.assignment.exception.InvalidTokenException;
 import com.neeraj.assignment.model.TokenUserDetails;
 
 import io.jsonwebtoken.Claims;
@@ -37,7 +38,7 @@ public class CustomAuthenticationValidator {
 			tokenUserDetails.setRole((String) body.get("role"));
 
 		} catch (Exception e) {
-			new RuntimeException("Invalid Token.");
+			throw new InvalidTokenException("Invalid Token received.");
 		}
 		return tokenUserDetails;
 	}

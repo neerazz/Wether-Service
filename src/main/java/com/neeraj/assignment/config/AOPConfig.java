@@ -34,7 +34,8 @@ public class AOPConfig {
 	private void allPointCutDeclatation() {
 	}
 
-	@Around("servicePointCutDeclatation() || modelPointCutDeclatation()")
+//	@Around("servicePointCutDeclatation() || modelPointCutDeclatation()")
+	@Around("modelPointCutDeclatation()")
 //	@Around("servicePointCutDeclatation()")
 	private Object aroundAspect(ProceedingJoinPoint joinPoint) {
 
