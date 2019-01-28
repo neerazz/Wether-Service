@@ -52,7 +52,6 @@ public class AssignmentApplicationTests {
 				.andExpect(jsonPath("$.city_name").value("Maricopa"))
 				.andExpect(jsonPath("$.timezone").value("America/Phoenix"))
 				.andExpect(jsonPath("$.state_code").value("AZ"));
-
 	}
 
 	@Test
