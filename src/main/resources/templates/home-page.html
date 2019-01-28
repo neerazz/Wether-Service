@@ -22,7 +22,9 @@
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="jwtToken" placeholder="Example: HEADER.PAYLOAD.SIGNATURE">
                 </div>
-                <button type="button" id="hourlyButton" class="btn btn-outline-warning">Generate Token</button>
+                <button type="button" id="tokenGenerateButton" class="btn btn-outline-warning">
+                    Generate Token
+                </button>
             </div>
         </form>
 
@@ -74,6 +76,7 @@
                         <div class="row">
                             <div class="col">
                                 <h5>JSON Response:</h5>
+                                <div id="copytoClipBoard"></div>
                             </div>
                         </div>
 
@@ -87,6 +90,47 @@
         </div>
         </div>
 
+        <!-- Refresh Modal -->
+        <div class="modal fade bd-example-modal-lg" id="refreshModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="text-center modal-title" id="exampleModalLabel"><i class="text-center">JWT Token
+                                Generator:</i> </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- This will the body of the submit form.-->
+                        <h5>Enter the below details to generate a JWT</h5>
+                        <form class="form-inline">
+                            <div class="form-group m-1">
+                                <label>Secreat Key:</label>
+                                <input type="text" id="secreatKey" class="form-control mx-sm-3" placeholder="Example: xxxxxxxx">
+                            </div>
+                            <div class="form-group m-1">
+                                    <label>Enter Name:</label>
+                                <input type="text" id="userName" class="form-control mx-sm-3" placeholder="Example: Neeraj Kumar">
+                            </div>
+                            <div class="form-group m-1">
+                                    <label>Enter UserId:</label>
+                                <input type="text" id="userID" class="form-control mx-sm-3" placeholder="Example: neeraj1234">
+                            </div>
+                        </form>
+                        <p class="m-2">
+                            <i><b><u>Note:</u></b> Copy the Token From JSON Response feild after generation.</i>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="generateButton" onclick="submitPostURLForTokenGeneration()" class="btn btn-primary">Generate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
@@ -94,7 +138,10 @@
         <script>
 
             var apiURL = "/api/";
+            var tokenGenerationURL = "/token";
             var lowest = false;
+            var copyToClipBoard = '<div class="bd-clipboard">';
+                copyToClipBoard += '<button class="btn-clipboard" title="" data-original-title="Copy to clipboard">Copy</button></div>';
 
             $(document).ready(function () {
 
@@ -114,6 +161,11 @@
                     loadLowestURL();
                 });
 
+                $("#tokenGenerateButton").click(function () {
+                    // submitPostURLForTokenGeneration();
+                    $('#refreshModal').modal('show');
+                });
+
             });
 
             function loadLowestURL() {
@@ -121,7 +173,7 @@
                 initilize();
                 lowest = true;
                 var finalURL = apiURL + radioBokChanged() + "/lowest";
-                $("#requestURL").text(finalURL);
+                // $("#requestURL").text(finalURL);
                 submitTheGetURL(finalURL);
             }
 
@@ -130,12 +182,13 @@
                 initilize();
                 lowest = false;
                 var finalURL = apiURL + radioBokChanged();
-                $("#requestURL").text(finalURL);
+                // $("#requestURL").text(finalURL);
                 submitTheGetURL(finalURL);
             }
 
             function submitTheGetURL(finalURL) {
 
+                setTagValue("requestURL", finalURL);
                 var jsonToken = $('#jwtToken').val();
                 var token = "Token " + jsonToken;
                 // console.log(token);
@@ -150,12 +203,45 @@
                     },
                     success: function (data) {
                         buildPage(data);
-                        $("#responseURL").text(JSON.stringify(data, null, 2));
+                        setTagValue("responseURL", JSON.stringify(data, null, 2));
+                        // $("#responseURL").text(JSON.stringify(data, null, 2));
                     },
                     error: function (data) {
-                        $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
+                        setTagValue("responseURL", JSON.stringify(data.responseJSON, null, 2));
+                        // $("#responseURL").text(JSON.stringify(data.responseJSON, null, 2));
                     }
                 });
+            }
+
+            function submitPostURLForTokenGeneration() {
+
+                var inputDate = {
+                    userName: $('#userName').val(),
+                    userId: $('#userID').val(),
+                    role: "user",
+                    secreatKey: $('#secreatKey').val()
+                }
+
+                $('#refreshModal').modal('hide');
+
+                setTagValue("requestURL", tokenGenerationURL);
+
+                // Call the TokenGeneration REST API.
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json',
+                    url: tokenGenerationURL,
+                    data: JSON.stringify(inputDate),
+                    success: function (data) {
+                        // console.log(data);
+                        setTagValue("responseURL", data);
+                        $("#jwtToken").val(data);
+                    },
+                    error: function (data) {
+                        setTagValue("responseURL", JSON.stringify(data.responseJSON, null, 2));
+                    }
+                });
+
             }
 
             function initilize() {
@@ -165,8 +251,16 @@
                 $("#wetherdataheadder").text(" ");
             }
 
+            function setTagValue(tagName, tagValue) {
+                $("#" + tagName).text(tagValue);
+
+                // if(tagName == "responseURL"){
+                //     $("#copytoClipBoard").html('<button class="btn-clipboard" title="" data-original-title="Copy to clipboard">Copy</button>');
+                // }
+            }
+
             function buildPage(dump) {
-                
+
                 // console.log(dump);
 
                 var weatherTag = '<div> <div class="row border justify-content-center bg-success text-white"> ' +
@@ -199,7 +293,6 @@
                 } else {
                     $("#wetherdataheadder").text("Hourly weather in " + city + "(Zip Code:" + $('#zipcode').val() + ") on " + datefeild + " is:");
                 }
-
 
                 var output = '<div class="row border justify-content-center">';
                 output += '<h5 class="col" style="text-align: center">' + input.timestamp_local[3] + ":00 hrs" + '</h5>';

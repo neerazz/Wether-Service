@@ -20,13 +20,19 @@ public class GlobalException {
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(InvalidSecreatKeyException.class)
+	public ResponseEntity<ErrorResponse> handleException(InvalidSecreatKeyException exc) {
+		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exc.getMessage());
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
 	@ExceptionHandler(InvalidZipCodeException.class)
 	public ResponseEntity<ErrorResponse> handleException(InvalidZipCodeException exc) {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), exc.getMessage());
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
-	@ExceptionHandler(InvalidTokenException.class)
+	@ExceptionHandler({ InvalidTokenException.class })
 	public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(InvalidTokenException exc) {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), exc.getMessage());
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.UNAUTHORIZED);
@@ -48,5 +54,4 @@ public class GlobalException {
 		ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), errorMessage);
 		return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
 	}
-
 }

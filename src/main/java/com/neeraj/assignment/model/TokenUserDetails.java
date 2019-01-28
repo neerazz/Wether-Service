@@ -33,4 +33,9 @@ public class TokenUserDetails {
 	public String getRole() {
 		return role;
 	}
+
+	@Override
+	public String toString() {
+		return "TokenUserDetails [userName=" + userName + ", userId=" + userId + ", role=" + role + "]";
+	}
 }

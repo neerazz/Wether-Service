@@ -38,6 +38,7 @@ public class CustomAuthenticationValidator {
 			tokenUserDetails.setRole((String) body.get("role"));
 
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw new InvalidTokenException("Invalid Token received.");
 		}
 		return tokenUserDetails;
