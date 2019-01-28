@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.neeraj</groupId>
 	<artifactId>assignment</artifactId>
-	<version>1.0.0</version>
+	<version>Final</version>
 	<name>assignment</name>
 	<description>Weather Assignment For Marsh</description>
 
@@ -66,6 +66,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+				<mainClass>com.neeraj.assignment.AssignmentApplication</mainClass>
+					<executable>true</executable>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

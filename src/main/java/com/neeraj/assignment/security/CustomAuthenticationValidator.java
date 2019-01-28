@@ -25,7 +25,7 @@ public class CustomAuthenticationValidator {
 
 	private final Logger log = LoggerFactory.getLogger(CustomAuthenticationValidator.class);
 
-	public TokenUserDetails validate(String token) {
+	public TokenUserDetails validate(String token) throws InvalidTokenException {
 
 		log.trace("validate");
 		try {
