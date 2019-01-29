@@ -1,5 +1,6 @@
 package com.neeraj.assignment.model;
 
+
 public class FrontEndUserModel {
 
 	private String userName;
@@ -17,8 +18,9 @@ public class FrontEndUserModel {
 	/**
 	 * @param userName the userName to set
 	 */
-	public void setUserName(String userName) {
+	public FrontEndUserModel setUserName(String userName) {
 		this.userName = userName;
+		return this;
 	}
 
 	/**
@@ -31,8 +33,9 @@ public class FrontEndUserModel {
 	/**
 	 * @param userId the userId to set
 	 */
-	public void setUserId(String userId) {
+	public FrontEndUserModel setUserId(String userId) {
 		this.userId = userId;
+		return this;
 	}
 
 	/**
@@ -45,8 +48,9 @@ public class FrontEndUserModel {
 	/**
 	 * @param role the role to set
 	 */
-	public void setRole(String role) {
+	public FrontEndUserModel setRole(String role) {
 		this.role = role;
+		return this;
 	}
 
 	/**
@@ -59,8 +63,9 @@ public class FrontEndUserModel {
 	/**
 	 * @param secreatKey the secreatKey to set
 	 */
-	public void setSecreatKey(String secreatKey) {
+	public FrontEndUserModel setSecreatKey(String secreatKey) {
 		this.secreatKey = secreatKey;
+		return this;
 	}
 
 	/*

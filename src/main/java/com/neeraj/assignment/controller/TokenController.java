@@ -19,7 +19,7 @@ public class TokenController {
 
 	@Autowired
 	private CustomTokenGenerator jwtGenerator;
-	private static final Logger logger = LoggerFactory.getLogger(APIController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
 	@PostMapping
 	public String generateToken(@RequestBody final FrontEndUserModel inputUserDetails, HttpServletRequest req) {

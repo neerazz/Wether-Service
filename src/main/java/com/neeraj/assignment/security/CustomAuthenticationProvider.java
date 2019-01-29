@@ -1,7 +1,8 @@
 package com.neeraj.assignment.security;
 
-import java.util.List;
-
+import com.neeraj.assignment.exception.CustomAuthenticationException;
+import com.neeraj.assignment.model.CustomUserDetails;
+import com.neeraj.assignment.model.TokenUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,52 +14,53 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.neeraj.assignment.exception.InvalidTokenException;
-import com.neeraj.assignment.model.CustomUserDetails;
-import com.neeraj.assignment.model.TokenUserDetails;
+import java.util.List;
 
 @Component
 public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-	@Autowired
-	private CustomAuthenticationValidator validator;
+    @Autowired
+    private CustomAuthenticationValidator validator;
 
-	@Autowired
-	private CustomUserDetails customUserDetails;
+    @Autowired
+    private CustomUserDetails customUserDetails;
 
-	private final Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
+    @Autowired
+    private TokenUserDetails tokenUserDetails;
 
-	@Override
-	protected void additionalAuthenticationChecks(UserDetails userDetails,
-			UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-		log.trace("additionalAuthenticationChecks");
-	}
+    private final Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
-	@Override
-	protected UserDetails retrieveUser(String username,
-			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
+    @Override
+    protected void additionalAuthenticationChecks(UserDetails userDetails,
+                                                  UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        log.trace("additionalAuthenticationChecks");
+    }
 
-		log.trace("retrieveUser");
+    @Override
+    protected UserDetails retrieveUser(String username,
+                                       UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
 
-		CustomAuthenticationToken jwtAuthenticationToken = (CustomAuthenticationToken) usernamePasswordAuthenticationToken;
-		String token = jwtAuthenticationToken.getToken();
+        log.trace("retrieveUser");
 
-		TokenUserDetails jwtUser = validator.validate(token);
+        CustomAuthenticationToken jwtAuthenticationToken = (CustomAuthenticationToken) usernamePasswordAuthenticationToken;
+        String token = jwtAuthenticationToken.getToken();
 
-		if (jwtUser == null) {
-			throw new InvalidTokenException("Invalid Token entered. Enter a valid token.");
-		}
+        try {
+            tokenUserDetails = validator.validate(token);
+            List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+                    .commaSeparatedStringToAuthorityList(tokenUserDetails.getRole());
+            customUserDetails.setUserName(tokenUserDetails.getUserName()).setUserID(tokenUserDetails.getId()).setToken(token)
+                    .setAuthorities(grantedAuthorities);
+        } catch (Exception e) {
+            throw new CustomAuthenticationException("Kindly provide a token. The token field is empty.");
+        }
+        return customUserDetails;
+    }
 
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-				.commaSeparatedStringToAuthorityList(jwtUser.getRole());
+    @Override
+    public boolean supports(Class<?> aClass) {
+        log.trace("supports");
+        return (CustomAuthenticationToken.class.isAssignableFrom(aClass));
+    }
 
-		return customUserDetails.setUserName(jwtUser.getUserName()).setUserID(jwtUser.getId()).setToken(token)
-				.setAuthorities(grantedAuthorities);
-	}
-
-	@Override
-	public boolean supports(Class<?> aClass) {
-		log.trace("supports");
-		return (CustomAuthenticationToken.class.isAssignableFrom(aClass));
-	}
 }

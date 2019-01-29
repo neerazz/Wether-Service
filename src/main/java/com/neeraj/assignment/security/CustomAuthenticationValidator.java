@@ -1,17 +1,14 @@
 package com.neeraj.assignment.security;
 
+import com.neeraj.assignment.model.TokenUserDetails;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-
-import com.neeraj.assignment.exception.InvalidTokenException;
-import com.neeraj.assignment.model.TokenUserDetails;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 @Component
 @PropertySource({ "classpath:application.properties" })
@@ -25,22 +22,14 @@ public class CustomAuthenticationValidator {
 
 	private final Logger log = LoggerFactory.getLogger(CustomAuthenticationValidator.class);
 
-	public TokenUserDetails validate(String token) throws InvalidTokenException {
+	public TokenUserDetails validate(String token) {
 
 		log.trace("validate");
-		try {
-			Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		tokenUserDetails.setUserName(body.getSubject())
+				.setId((String) body.get("userId"))
+				.setRole((String) body.get("role"));
 
-			tokenUserDetails = new TokenUserDetails();
-
-			tokenUserDetails.setUserName(body.getSubject());
-			tokenUserDetails.setId((String) body.get("userId"));
-			tokenUserDetails.setRole((String) body.get("role"));
-
-		} catch (Exception e) {
-			log.error(e.getMessage());
-			throw new InvalidTokenException("Invalid Token received.");
-		}
 		return tokenUserDetails;
 	}
 }

@@ -1,55 +1,62 @@
 package com.neeraj.assignment.security;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import com.neeraj.assignment.exception.InvalidTokenException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class CustomAuthenticationTokenFilter extends AbstractAuthenticationProcessingFilter {
 
-	@Autowired
-	private CustomAuthenticationToken token;
+    @Autowired
+    private CustomAuthenticationToken token;
 
-	private final Logger log = LoggerFactory.getLogger(CustomAuthenticationTokenFilter.class);
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
-	public CustomAuthenticationTokenFilter() {
-		super("/api/**");
-		log.trace("JwtAuthenticationTokenFilter");
-	}
+    private final Logger log = LoggerFactory.getLogger(CustomAuthenticationTokenFilter.class);
 
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
+    public CustomAuthenticationTokenFilter() {
+        super("/api/**");
+        log.trace("JwtAuthenticationTokenFilter");
+    }
 
-		log.trace("attemptAuthentication");
-		String header = httpServletRequest.getHeader("Authorisation");
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest httpServletRequest,
+                                                HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
 
-		if (header == null || !header.startsWith("Token ")) {
-			throw new InvalidTokenException("Kindly provide a token. The token feild is empty.");
-		}
+        log.trace("attemptAuthentication");
 
-		String authenticationToken = header.substring(6);
+        String header = httpServletRequest.getHeader("Authorisation");
 
-		return getAuthenticationManager().authenticate(token.setToken(authenticationToken));
-	}
+        String authenticationToken = null;
 
-	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
+        if (header != null &&  header.startsWith("Token ")) {
+            authenticationToken = header.substring(6);
+        }
 
-		super.successfulAuthentication(request, response, chain, authResult);
-		log.trace("successfulAuthentication");
-		chain.doFilter(request, response);
-	}
+        return getAuthenticationManager().authenticate(token.setToken(authenticationToken));
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
+
+        super.successfulAuthentication(request, response, chain, authResult);
+        log.trace("successfulAuthentication");
+        chain.doFilter(request, response);
+    }
+
+    @Override
+    public void setAuthenticationFailureHandler(AuthenticationFailureHandler failureHandler) {
+        super.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
+    }
 }

@@ -13,12 +13,12 @@ import com.neeraj.assignment.service.WeatherService;
 
 @RestController
 @RequestMapping("/api")
-public class APIController {
+public class ApiController {
 
 	@Autowired
 	private WeatherService weatherService;
 
-	private static final Logger logger = LoggerFactory.getLogger(APIController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
 	@GetMapping("/{days}/{zipCode}")
 	public WeatherEntry getWeather(@PathVariable(value = "days") Integer days,

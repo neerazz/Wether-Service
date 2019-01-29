@@ -1,25 +1,33 @@
 package com.neeraj.assignment;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.neeraj.assignment.controller.ApiController;
+import com.neeraj.assignment.model.FrontEndUserModel;
+import com.neeraj.assignment.model.WeatherEntry;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockServletContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.neeraj.assignment.controller.APIController;
-import com.neeraj.assignment.model.WeatherEntry;
+import javax.servlet.ServletContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,11 +39,31 @@ public class AssignmentApplicationTests {
 	private WebApplicationContext webApplicationContext;
 
 	@MockBean
-	private APIController weatherController;
+	private ApiController weatherController;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Before
 	public void setUp() {
 		this.mockMVC = webAppContextSetup(webApplicationContext).build();
+	}
+
+	@Test
+	public void check_controller_present_in_webApplicationContext() {
+		ServletContext servletContext = webApplicationContext.getServletContext();
+
+		Assert.assertNotNull(servletContext);
+		Assert.assertTrue(servletContext instanceof MockServletContext);
+		Assert.assertNotNull(webApplicationContext.getBean("tokenController"));
+		Assert.assertNotNull(webApplicationContext.getBean("apiController"));
+		Assert.assertNotNull(webApplicationContext.getBean("mvcController"));
+	}
+
+	@Test
+	public void givenHomePageURI_whenMockMVC_thenReturnsIndexJSPViewName() throws Exception {
+		mockMVC.perform(get("/home"))
+				.andExpect(view().name("home-page"));
 	}
 
 	@Test
@@ -68,6 +96,23 @@ public class AssignmentApplicationTests {
 				.andExpect(jsonPath("$.city_name").value("Maricopa"))
 				.andExpect(jsonPath("$.timezone").value("America/Phoenix"))
 				.andExpect(jsonPath("$.state_code").value("AZ"));
+	}
 
+	@Test
+	public void test_generate_token_with_incorrect_secrete_key() throws Exception {
+
+		FrontEndUserModel userModel
+				= new FrontEndUserModel()
+				.setUserName("Test")
+				.setUserId("Test123")
+				.setSecreatKey("Test");
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders
+				.post("/token")
+				.accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(userModel))
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMVC.perform(requestBuilder).andReturn();
+		assertEquals(HttpStatus.FORBIDDEN.value(),result.getResponse().getStatus());
 	}
 }

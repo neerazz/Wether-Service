@@ -25,7 +25,7 @@ public class CustomTokenGenerator {
 	public String generate(FrontEndUserModel inputUser) {
 
 		log.trace("generate");
-		validateSecreatKey(inputUser.getSecreatKey());
+		validateSecretKey(inputUser.getSecreatKey());
 		Claims claims = Jwts.claims().setSubject(inputUser.getUserName());
 		claims.put("userId", String.valueOf(inputUser.getUserId()));
 		claims.put("role", inputUser.getRole());
@@ -34,11 +34,11 @@ public class CustomTokenGenerator {
 		return newToken;
 	}
 
-	private void validateSecreatKey(String inputSecreatKey) {
-		log.trace("validateSecreatKey with input as:" + inputSecreatKey);
-		if (!secretKey.equalsIgnoreCase(inputSecreatKey)) {
+	private void validateSecretKey(String inputSecretKey) {
+		log.trace("validateSecretKey with input as:" + inputSecretKey);
+		if (!secretKey.equalsIgnoreCase(inputSecretKey)) {
 			throw new InvalidSecreatKeyException(
-					"The entered Secreat key:'" + inputSecreatKey + "' is invalid. Enter Valid Secreat key");
+					"The entered Secret key:'" + inputSecretKey + "' is invalid. Enter Valid Secret key");
 		}
 	}
 }
