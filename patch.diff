@@ -1,0 +1,13 @@
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+index 6857850..739afdb 100644
+--- a/src/main/resources/application.properties
++++ b/src/main/resources/application.properties
+@@ -5,7 +5,7 @@ weather.app.key=6adb955d60f744b09d0e58ce86db427f
+ application.secret.key=marshWeatherAssignment
+ 
+ # Logging configaratoin.
+-logging.level.com.neeraj=INFO
++logging.level.com.neeraj=TRACE
+ logging.level.org.springframework.web=INFO
+ logging.level.org.hibernate=ERROR
+ 
