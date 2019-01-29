@@ -10,16 +10,19 @@ public class TokenUserDetails {
 	private String userId;
 	private String role;
 
-	public void setUserName(String userName) {
+	public TokenUserDetails setUserName(String userName) {
 		this.userName = userName;
+		return this;
 	}
 
-	public void setId(String id) {
+	public TokenUserDetails setId(String id) {
 		this.userId = id;
+		return this;
 	}
 
-	public void setRole(String role) {
+	public TokenUserDetails setRole(String role) {
 		this.role = role;
+		return this;
 	}
 
 	public String getUserName() {
