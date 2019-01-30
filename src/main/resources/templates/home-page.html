@@ -238,6 +238,10 @@
                         $("#jwtToken").val(data);
                     },
                     error: function (data) {
+                    	var errorResponse = data.responseJSON;
+                    	if(errorResponse){
+                    		errorResponse = data;
+                    	}
                         setTagValue("responseURL", JSON.stringify(data.responseJSON, null, 2));
                     }
                 });

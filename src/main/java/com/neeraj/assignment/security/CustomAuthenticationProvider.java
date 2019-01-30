@@ -1,8 +1,7 @@
 package com.neeraj.assignment.security;
 
-import com.neeraj.assignment.exception.CustomAuthenticationException;
-import com.neeraj.assignment.model.CustomUserDetails;
-import com.neeraj.assignment.model.TokenUserDetails;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,53 +13,54 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.neeraj.assignment.exception.CustomAuthenticationException;
+import com.neeraj.assignment.model.CustomUserDetails;
+import com.neeraj.assignment.model.TokenUserDetails;
 
 @Component
 public class CustomAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    @Autowired
-    private CustomAuthenticationValidator validator;
+	@Autowired
+	private CustomAuthenticationValidator validator;
 
-    @Autowired
-    private CustomUserDetails customUserDetails;
+	@Autowired
+	private CustomUserDetails customUserDetails;
 
-    @Autowired
-    private TokenUserDetails tokenUserDetails;
+	@Autowired
+	private TokenUserDetails tokenUserDetails;
 
-    private final Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
+	private final Logger log = LoggerFactory.getLogger(CustomAuthenticationProvider.class);
 
-    @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails,
-                                                  UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        log.trace("additionalAuthenticationChecks");
-    }
+	@Override
+	protected void additionalAuthenticationChecks(UserDetails userDetails,
+			UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+		log.trace("additionalAuthenticationChecks");
+	}
 
-    @Override
-    protected UserDetails retrieveUser(String username,
-                                       UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
+	@Override
+	protected UserDetails retrieveUser(String username,
+			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
 
-        log.trace("retrieveUser");
+		log.trace("retrieveUser");
 
-        CustomAuthenticationToken jwtAuthenticationToken = (CustomAuthenticationToken) usernamePasswordAuthenticationToken;
-        String token = jwtAuthenticationToken.getToken();
+		CustomAuthenticationToken jwtAuthenticationToken = (CustomAuthenticationToken) usernamePasswordAuthenticationToken;
+		String token = jwtAuthenticationToken.getToken();
 
-        try {
-            tokenUserDetails = validator.validate(token);
-            List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-                    .commaSeparatedStringToAuthorityList(tokenUserDetails.getRole());
-            customUserDetails.setUserName(tokenUserDetails.getUserName()).setUserID(tokenUserDetails.getId()).setToken(token)
-                    .setAuthorities(grantedAuthorities);
-        } catch (Exception e) {
-            throw new CustomAuthenticationException("Kindly provide a token. The token field is empty.");
-        }
-        return customUserDetails;
-    }
+		try {
+			tokenUserDetails = validator.validate(token);
+			List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+					.commaSeparatedStringToAuthorityList(tokenUserDetails.getRole());
+			customUserDetails.setUserName(tokenUserDetails.getUserName()).setUserID(tokenUserDetails.getId())
+					.setToken(token).setAuthorities(grantedAuthorities);
+		} catch (Exception e) {
+			throw new CustomAuthenticationException("Kindly provide a token. The token field is empty.");
+		}
+		return customUserDetails;
+	}
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        log.trace("supports");
-        return (CustomAuthenticationToken.class.isAssignableFrom(aClass));
-    }
-
+	@Override
+	public boolean supports(Class<?> aClass) {
+		log.trace("supports");
+		return (CustomAuthenticationToken.class.isAssignableFrom(aClass));
+	}
 }

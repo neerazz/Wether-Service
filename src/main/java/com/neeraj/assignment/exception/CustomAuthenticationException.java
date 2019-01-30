@@ -3,7 +3,9 @@ package com.neeraj.assignment.exception;
 import org.springframework.security.core.AuthenticationException;
 
 public class CustomAuthenticationException extends AuthenticationException {
-    public CustomAuthenticationException(String msg) {
-        super(msg);
-    }
+	private static final long serialVersionUID = 1L;
+
+	public CustomAuthenticationException(String msg) {
+		super(msg);
+	}
 }

@@ -1,16 +1,24 @@
 package com.neeraj.assignment;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.neeraj.assignment.controller.ApiController;
-import com.neeraj.assignment.model.FrontEndUserModel;
-import com.neeraj.assignment.model.WeatherEntry;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+
+import javax.servlet.ServletContext;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockServletContext;
@@ -21,16 +29,14 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.servlet.ServletContext;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.neeraj.assignment.controller.ApiController;
+import com.neeraj.assignment.model.FrontEndUserModel;
+import com.neeraj.assignment.model.WeatherEntry;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@PropertySource({ "classpath:application.properties" })
 public class AssignmentApplicationTests {
 
 	private MockMvc mockMVC;
@@ -43,6 +49,9 @@ public class AssignmentApplicationTests {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Value("${application.secret.key}")
+	private String secreatKey;
 
 	@Before
 	public void setUp() {
@@ -60,11 +69,11 @@ public class AssignmentApplicationTests {
 		Assert.assertNotNull(webApplicationContext.getBean("mvcController"));
 	}
 
-	@Test
-	public void givenHomePageURI_whenMockMVC_thenReturnsIndexJSPViewName() throws Exception {
-		mockMVC.perform(get("/home"))
-				.andExpect(view().name("home-page"));
-	}
+//	@Test
+//	public void givenHomePageURI_whenMockMVC_thenReturnsIndexJSPViewName() throws Exception {
+//		mockMVC.perform(get("/home"))
+//				.andExpect(view().name("home-page"));
+//	}
 
 	@Test
 	public void getWeather() throws Exception {
@@ -101,18 +110,30 @@ public class AssignmentApplicationTests {
 	@Test
 	public void test_generate_token_with_incorrect_secrete_key() throws Exception {
 
-		FrontEndUserModel userModel
-				= new FrontEndUserModel()
-				.setUserName("Test")
-				.setUserId("Test123")
-				.setSecreatKey("Test");
-
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.post("/token")
-				.accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(userModel))
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/token").accept(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(getUserDetails("negative")))
 				.contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMVC.perform(requestBuilder).andReturn();
-		assertEquals(HttpStatus.FORBIDDEN.value(),result.getResponse().getStatus());
+		assertEquals(HttpStatus.FORBIDDEN.value(), result.getResponse().getStatus());
+	}
+
+	@Test
+	public void test_generate_token_with_correct_secrete_key() throws Exception {
+
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/token").accept(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(getUserDetails("Positive")))
+				.contentType(MediaType.APPLICATION_JSON);
+
+		MvcResult result = mockMVC.perform(requestBuilder).andReturn();
+		assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+	}
+
+	private FrontEndUserModel getUserDetails(String type) {
+		if (type.equalsIgnoreCase("positive")) {
+			return new FrontEndUserModel().setUserName("Positive").setUserId("P_Test123").setSecreatKey(secreatKey);
+		} else {
+			return new FrontEndUserModel().setUserName("Negative").setUserId("N_Test123").setSecreatKey("Test");
+		}
 	}
 }
